@@ -1,73 +1,68 @@
 package hcmute.edu.vn.healthtracking.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Objects;
+
 import hcmute.edu.vn.healthtracking.R;
+import hcmute.edu.vn.healthtracking.fragments.ChatbotFragment;
+import hcmute.edu.vn.healthtracking.fragments.ExerciseFragment;
+import hcmute.edu.vn.healthtracking.fragments.HomeFragment;
+import hcmute.edu.vn.healthtracking.fragments.ProfileFragment;
+import hcmute.edu.vn.healthtracking.fragments.UploadFragment;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView tvCalories, tvSteps, tvActiveMinutes;
-    private ProgressBar progressBar;
-    private ImageButton btnAdd;
-    private RecyclerView rvHealthTiles;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Initialize UI components
-        tvCalories = findViewById(R.id.tv_calories);
-        tvSteps = findViewById(R.id.tv_steps);
-        tvActiveMinutes = findViewById(R.id.tv_active_minutes);
-        progressBar = findViewById(R.id.progress_bar);
-        btnAdd = findViewById(R.id.btn_add);
-
-        // Set up RecyclerView
-
         // Set up BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.nav_home); // Highlight Home by default
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                // Already on MainActivity (Home), no action needed
-                return true;
-            } else if (itemId == R.id.nav_exercise) {
-                startActivity(new Intent(this, WorkoutActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.nav_stats) {
-                startActivity(new Intent(this, WorkoutActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(this, WorkoutActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
+        // Load HomeFragment as the default view
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new HomeFragment())
+                .commit();
+
+        // Set event listener
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment;
+            switch (Objects.requireNonNull(item.getTitle()).toString()) {
+                case "Home":
+                    selectedFragment = new HomeFragment();
+                    break;
+                case "Workout":
+                    selectedFragment = new ExerciseFragment();
+                    break;
+                case "Chatbot":
+                    selectedFragment = new ChatbotFragment();
+                    break;
+                case "Upload":
+                    selectedFragment = new UploadFragment();
+                    break;
+                case "Profile":
+                    selectedFragment = new ProfileFragment();
+                    break;
+                default:
+                    return false;
             }
-            return false;
-        });
-
-        // Sample data (to be replaced with real data from a health tracker)
-        updateMetrics(0, 6, 0, 25);
-
-        // Add button click listener (placeholder for adding data)
-        btnAdd.setOnClickListener(v -> {
-            // Implement add data functionality here
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, selectedFragment)
+                    .commit();
+            return true;
         });
 
         // Handle window insets for edge-to-edge display
@@ -76,12 +71,5 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-    }
-
-    private void updateMetrics(int calories, int steps, int activeMinutes, int progress) {
-        tvCalories.setText(String.valueOf(calories));
-        tvSteps.setText(String.valueOf(steps));
-        tvActiveMinutes.setText(String.valueOf(activeMinutes));
-        progressBar.setProgress(progress);
     }
 }

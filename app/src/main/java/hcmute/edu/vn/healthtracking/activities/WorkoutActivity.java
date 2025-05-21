@@ -10,6 +10,6 @@ public class WorkoutActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_workout); // Create activity_exercise.xml if needed
+        setContentView(R.layout.fragment_workout); // Create activity_exercise.xml if needed
     }
 }
