@@ -25,7 +25,7 @@ public class Exercise {
         this.endTime = endTime;
         this.date = date;
         this.distance = distance;
-        calculateDuration();
+//        calculateDuration();
     }
 
     // Constructor đầy đủ
@@ -74,7 +74,7 @@ public class Exercise {
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
         if (this.endTime != null) {
-            calculateDuration();
+//            calculateDuration();
         }
     }
 
@@ -85,7 +85,7 @@ public class Exercise {
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
         if (this.startTime != null) {
-            calculateDuration();
+//            calculateDuration();
         }
     }
 
