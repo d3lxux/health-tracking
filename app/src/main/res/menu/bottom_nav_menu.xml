@@ -8,14 +8,15 @@
         android:id="@+id/nav_exercise"
         android:icon="@drawable/ic_workout"
         android:title="Workout" />
-    <item
-        android:id="@+id/nav_chatbot"
-        android:icon="@drawable/ic_chatbot"
-        android:title="Chatbot" />
+
     <item
         android:id="@+id/nav_upload"
         android:icon="@drawable/ic_cloud"
         android:title="Upload" />
+    <item
+        android:id="@+id/nav_schedule"
+        android:icon="@drawable/ic_schedule"
+        android:title="Schedule" />
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_profile"
