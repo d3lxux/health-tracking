@@ -18,7 +18,9 @@ import hcmute.edu.vn.healthtracking.fragments.ChatbotFragment;
 import hcmute.edu.vn.healthtracking.fragments.ExerciseFragment;
 import hcmute.edu.vn.healthtracking.fragments.HomeFragment;
 import hcmute.edu.vn.healthtracking.fragments.ProfileFragment;
+import hcmute.edu.vn.healthtracking.fragments.ScheduleFragment;
 import hcmute.edu.vn.healthtracking.fragments.UploadFragment;
+import hcmute.edu.vn.healthtracking.fragments.ScheduleFragment;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -51,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case "Upload":
                     selectedFragment = new UploadFragment();
+                    break;
+                case "Schedule":
+                    selectedFragment = new ScheduleFragment();
                     break;
                 case "Profile":
                     selectedFragment = new ProfileFragment();
