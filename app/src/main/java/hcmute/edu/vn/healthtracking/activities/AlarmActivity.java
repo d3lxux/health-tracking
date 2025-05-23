@@ -38,7 +38,7 @@ public class AlarmActivity extends AppCompatActivity {
         String description = intent.getStringExtra("description");
         long timeInMillis = intent.getLongExtra("time", 0);
 
-        // Kiểm tra nếu `timeInMillis` hợp lệ
+
         if (timeInMillis > 0) {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.US);
             String formattedTime = sdf.format(new Date(timeInMillis));
