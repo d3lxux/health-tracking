@@ -1,5 +1,9 @@
 package hcmute.edu.vn.healthtracking.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,24 +15,26 @@ import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import hcmute.edu.vn.healthtracking.R;
 import hcmute.edu.vn.healthtracking.database.DatabaseHelper;
 import hcmute.edu.vn.healthtracking.models.Exercise;
 import hcmute.edu.vn.healthtracking.models.UserProfile;
+import hcmute.edu.vn.healthtracking.services.StepTrackingService;
 import hcmute.edu.vn.healthtracking.utils.ExerciseUtils;
 
 public class HomeFragment extends Fragment {
 
-    private TextView stepsTextView, caloriesTextView, activeMinutesTextView;
+    private TextView stepsTextView, caloriesTextView, activeMinutesTextView, distanceTextView;
     private ProgressBar progressBar;
     private DatabaseHelper dbHelper;
     private UserProfile userProfile;
     private static final int STEP_GOAL = 6000; // Mục tiêu 6000 bước
     private static final int CALORIE_GOAL = 300; // Mục tiêu 300 kcal
     private static final int ACTIVE_MINUTES_GOAL = 30; // Mục tiêu 30 phút
+    private static final String ACTION_UPDATE_UI = "hcmute.edu.vn.healthtracking.ACTION_UPDATE_UI";
+    private BroadcastReceiver uiUpdateReceiver;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,6 +44,7 @@ public class HomeFragment extends Fragment {
         stepsTextView = view.findViewById(R.id.tv_steps);
         caloriesTextView = view.findViewById(R.id.tv_calories);
         activeMinutesTextView = view.findViewById(R.id.tv_active_minutes);
+        distanceTextView = view.findViewById(R.id.tv_distance);
         progressBar = view.findViewById(R.id.progress_bar);
 
         // Khởi tạo database
@@ -46,37 +53,58 @@ public class HomeFragment extends Fragment {
         // Lấy thông tin người dùng
         userProfile = dbHelper.getUserProfile();
         if (userProfile == null) {
-            // Giả lập thông tin người dùng nếu chưa có
             userProfile = new UserProfile("Default User", 30, 170.0f, 70.0f, null);
             dbHelper.saveUserProfile(userProfile.getName(), userProfile.getAge(),
                     userProfile.getHeight(), userProfile.getWeight(), null);
         }
 
+        // Start StepTrackingService
+        Intent serviceIntent = new Intent(requireContext(), StepTrackingService.class);
+        requireContext().startService(serviceIntent);
+
+        // Register BroadcastReceiver for UI updates
+        uiUpdateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                updateUI();
+            }
+        };
+        IntentFilter filter = new IntentFilter(ACTION_UPDATE_UI);
+        requireContext().registerReceiver(uiUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+
         // Cập nhật giao diện
         updateUI();
 
-        // Giả lập thêm dữ liệu bước chân (thay bằng StepServiceProvider sau này)
-        simulateStepTracking();
-
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (uiUpdateReceiver != null) {
+            requireContext().unregisterReceiver(uiUpdateReceiver);
+            uiUpdateReceiver = null;
+        }
     }
 
     private void updateUI() {
         // Lấy ngày hiện tại
         String today = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
 
-        // Lấy danh sách bài tập hôm nay
-        List<Exercise> todayExercises = dbHelper.getExercisesByDate(today);
+        // Lấy bài tập Walking hôm nay
+        Exercise walkingExercise = dbHelper.getWalkingExerciseByDate(today);
 
-        int totalSteps = 0;
+        // Calculate total steps (Walking + Running)
+        int totalSteps = ExerciseUtils.getTotalSteps(new Date(), dbHelper);
+
         int totalCalories = 0;
         long totalDuration = 0; // milliseconds
+        double totalDistance = 0.0;
 
-        // Tính tổng số bước, calories, và thời gian vận động
-        for (Exercise exercise : todayExercises) {
-            totalSteps += ExerciseUtils.calculateSteps(exercise);
-            totalCalories += exercise.getCaloriesBurned();
-            totalDuration += exercise.getDuration();
+        if (walkingExercise != null) {
+            totalCalories = walkingExercise.getCaloriesBurned();
+            totalDuration = walkingExercise.getDuration();
+            totalDistance = walkingExercise.getDistance();
         }
 
         // Chuyển đổi duration sang phút
@@ -86,34 +114,10 @@ public class HomeFragment extends Fragment {
         stepsTextView.setText(String.format(Locale.getDefault(), "%d", totalSteps));
         caloriesTextView.setText(String.format(Locale.getDefault(), "%d", totalCalories));
         activeMinutesTextView.setText(String.format(Locale.getDefault(), "%d", totalActiveMinutes));
+        distanceTextView.setText(String.format(Locale.getDefault(), "%.2f", totalDistance));
 
         // Cập nhật ProgressBar dựa trên số bước
         int progress = (int) ((totalSteps / (float) STEP_GOAL) * 100);
         progressBar.setProgress(Math.min(progress, 100));
-    }
-
-    private void simulateStepTracking() {
-        // Giả lập dữ liệu bước chân
-        int simulatedSteps = 5000; // Giả lập 5000 bước
-        double distance = simulatedSteps / 1100.0; // Giả lập khoảng cách (dựa trên công thức trong ExerciseUtils)
-        long duration = 3600 * 1000; // Giả lập 1 giờ hoạt động
-
-        // Tạo bài tập mới
-        Exercise exercise = new Exercise(
-                "user1", // Giả lập userId
-                "WALKING",
-                new Date(System.currentTimeMillis() - duration), // 1 giờ trước
-                new Date(),
-                new Date(),
-                distance
-        );
-        exercise.setDuration(duration);
-        exercise.setCaloriesBurned(ExerciseUtils.calculateCaloriesWithUserProfile(exercise, userProfile));
-
-        // Lưu vào database
-        dbHelper.addExercise(exercise);
-
-        // Cập nhật lại giao diện
-        updateUI();
     }
 }

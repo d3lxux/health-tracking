@@ -2,6 +2,8 @@ package hcmute.edu.vn.healthtracking.models;
 
 import java.util.Date;
 
+import hcmute.edu.vn.healthtracking.utils.ExerciseUtils;
+
 public class Exercise {
     private int id;
     private String userId;
@@ -12,25 +14,27 @@ public class Exercise {
     private double distance;      // km
     private long duration;        // milliseconds
     private int caloriesBurned;
+    private int steps;           // Added for Walking mode
 
     public Exercise() {
     }
 
     // Constructor cơ bản
     public Exercise(String userId, String exerciseType, Date startTime,
-                    Date endTime, Date date, double distance) {
+                    Date endTime, Date date, double distance, int steps) {
         this.userId = userId;
         this.exerciseType = exerciseType;
         this.startTime = startTime;
         this.endTime = endTime;
         this.date = date;
         this.distance = distance;
-//        calculateDuration();
+        this.steps = steps;
+        this.duration = ExerciseUtils.calculateDuration(startTime, endTime);
     }
 
     // Constructor đầy đủ
     public Exercise(int id, String userId, String exerciseType, Date startTime,
-                    Date endTime, Date date, double distance, long duration, int caloriesBurned) {
+                    Date endTime, Date date, double distance, long duration, int caloriesBurned, int steps) {
         this.id = id;
         this.userId = userId;
         this.exerciseType = exerciseType;
@@ -40,6 +44,7 @@ public class Exercise {
         this.distance = distance;
         this.duration = duration;
         this.caloriesBurned = caloriesBurned;
+        this.steps = steps;
     }
 
     // Getters và Setters
@@ -74,7 +79,7 @@ public class Exercise {
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
         if (this.endTime != null) {
-//            calculateDuration();
+            this.duration = ExerciseUtils.calculateDuration(startTime, endTime);
         }
     }
 
@@ -85,7 +90,7 @@ public class Exercise {
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
         if (this.startTime != null) {
-//            calculateDuration();
+            this.duration = ExerciseUtils.calculateDuration(startTime, endTime);
         }
     }
 
@@ -119,5 +124,13 @@ public class Exercise {
 
     public void setCaloriesBurned(int caloriesBurned) {
         this.caloriesBurned = caloriesBurned;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public void setSteps(int steps) {
+        this.steps = steps;
     }
 }

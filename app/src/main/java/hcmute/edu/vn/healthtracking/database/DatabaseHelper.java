@@ -22,7 +22,7 @@ import hcmute.edu.vn.healthtracking.utils.ExerciseUtils;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tasks.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5; // Incremented for steps column
 
     // Bảng tasks
     private static final String TABLE_TASKS = "tasks";
@@ -43,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_DISTANCE = "distance";
     private static final String COLUMN_DURATION = "duration";
     private static final String COLUMN_CALORIES_BURNED = "calories_burned";
+    private static final String COLUMN_STEPS = "steps"; // Added for Walking mode
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -76,7 +77,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_EXERCISE_DATE + " TEXT, " +
                 COLUMN_DISTANCE + " REAL, " +
                 COLUMN_DURATION + " INTEGER, " +
-                COLUMN_CALORIES_BURNED + " INTEGER)";
+                COLUMN_CALORIES_BURNED + " INTEGER, " +
+                COLUMN_STEPS + " INTEGER, " +
+                "UNIQUE(" + COLUMN_EXERCISE_DATE + ", " + COLUMN_EXERCISE_TYPE + "))";
         db.execSQL(createExerciseTable);
     }
 
@@ -102,6 +105,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_DISTANCE + " REAL, " +
                     COLUMN_DURATION + " INTEGER, " +
                     COLUMN_CALORIES_BURNED + " INTEGER)");
+        }
+        if (oldVersion < 4) {
+            db.execSQL("CREATE TABLE exercises_new (" +
+                    COLUMN_EXERCISE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_USER_ID + " TEXT, " +
+                    COLUMN_EXERCISE_TYPE + " TEXT, " +
+                    COLUMN_START_TIME + " INTEGER, " +
+                    COLUMN_END_TIME + " INTEGER, " +
+                    COLUMN_EXERCISE_DATE + " TEXT, " +
+                    COLUMN_DISTANCE + " REAL, " +
+                    COLUMN_DURATION + " INTEGER, " +
+                    COLUMN_CALORIES_BURNED + " INTEGER, " +
+                    "UNIQUE(" + COLUMN_EXERCISE_DATE + ", " + COLUMN_EXERCISE_TYPE + "))");
+
+            // Select the record with the maximum id for each exercise_date and exercise_type
+            db.execSQL("INSERT INTO exercises_new (" +
+                    COLUMN_EXERCISE_ID + ", " +
+                    COLUMN_USER_ID + ", " +
+                    COLUMN_EXERCISE_TYPE + ", " +
+                    COLUMN_START_TIME + ", " +
+                    COLUMN_END_TIME + ", " +
+                    COLUMN_EXERCISE_DATE + ", " +
+                    COLUMN_DISTANCE + ", " +
+                    COLUMN_DURATION + ", " +
+                    COLUMN_CALORIES_BURNED + ") " +
+                    "SELECT " +
+                    COLUMN_EXERCISE_ID + ", " +
+                    COLUMN_USER_ID + ", " +
+                    COLUMN_EXERCISE_TYPE + ", " +
+                    COLUMN_START_TIME + ", " +
+                    COLUMN_END_TIME + ", " +
+                    COLUMN_EXERCISE_DATE + ", " +
+                    COLUMN_DISTANCE + ", " +
+                    COLUMN_DURATION + ", " +
+                    COLUMN_CALORIES_BURNED + " " +
+                    "FROM " + TABLE_EXERCISES + " WHERE " + COLUMN_EXERCISE_ID + " IN (" +
+                    "SELECT MAX(" + COLUMN_EXERCISE_ID + ") FROM " + TABLE_EXERCISES + " " +
+                    "GROUP BY " + COLUMN_EXERCISE_DATE + ", " + COLUMN_EXERCISE_TYPE + ")");
+
+            db.execSQL("DROP TABLE " + TABLE_EXERCISES);
+            db.execSQL("ALTER TABLE exercises_new RENAME TO " + TABLE_EXERCISES);
+        }
+        if (oldVersion < 5) {
+            db.execSQL("ALTER TABLE " + TABLE_EXERCISES + " ADD COLUMN " + COLUMN_STEPS + " INTEGER DEFAULT 0");
         }
     }
 
@@ -245,7 +292,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // --- Quản lý Exercise ---
-    public long addExercise(Exercise exercise) {
+    public long addOrUpdateWalkingExercise(Exercise exercise) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_USER_ID, exercise.getUserId());
@@ -256,10 +303,71 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_DISTANCE, exercise.getDistance());
         values.put(COLUMN_DURATION, exercise.getDuration());
         values.put(COLUMN_CALORIES_BURNED, exercise.getCaloriesBurned());
+        values.put(COLUMN_STEPS, exercise.getSteps());
 
-        long exerciseId = db.insert(TABLE_EXERCISES, null, values);
+        // Check if a Walking record exists for the date
+        String dateStr = ExerciseUtils.formatDate(exercise.getDate(), "yyyyMMdd");
+        Cursor cursor = db.query(TABLE_EXERCISES,
+                new String[]{COLUMN_EXERCISE_ID},
+                COLUMN_EXERCISE_DATE + " = ? AND " + COLUMN_EXERCISE_TYPE + " = ?",
+                new String[]{dateStr, "WALKING"},
+                null, null, null);
+
+        long exerciseId;
+        if (cursor.moveToFirst()) {
+            // Update existing record
+            exerciseId = cursor.getLong(0);
+            db.update(TABLE_EXERCISES, values, COLUMN_EXERCISE_ID + " = ?", new String[]{String.valueOf(exerciseId)});
+            Log.d("DatabaseHelper", "Updated Walking exercise for date: " + dateStr);
+        } else {
+            // Insert new record
+            exerciseId = db.insert(TABLE_EXERCISES, null, values);
+            Log.d("DatabaseHelper", "Inserted new Walking exercise for date: " + dateStr);
+        }
+        cursor.close();
         db.close();
         return exerciseId;
+    }
+
+    public Exercise getWalkingExerciseByDate(String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_EXERCISES,
+                new String[]{COLUMN_EXERCISE_ID, COLUMN_USER_ID, COLUMN_EXERCISE_TYPE, COLUMN_START_TIME,
+                        COLUMN_END_TIME, COLUMN_EXERCISE_DATE, COLUMN_DISTANCE, COLUMN_DURATION, COLUMN_CALORIES_BURNED, COLUMN_STEPS},
+                COLUMN_EXERCISE_DATE + " = ? AND " + COLUMN_EXERCISE_TYPE + " = ?",
+                new String[]{date, "WALKING"},
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            Date exerciseDate = null;
+            String dateStr = cursor.getString(5);
+            if (dateStr != null) {
+                try {
+                    exerciseDate = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(dateStr);
+                } catch (ParseException e) {
+                    Log.e("DatabaseHelper", "Error parsing date: " + dateStr, e);
+                }
+            }
+
+            Exercise exercise = new Exercise(
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getLong(3) != 0 ? new java.util.Date(cursor.getLong(3)) : null,
+                    cursor.getLong(4) != 0 ? new java.util.Date(cursor.getLong(4)) : null,
+                    exerciseDate,
+                    cursor.getDouble(6),
+                    cursor.getLong(7),
+                    cursor.getInt(8),
+                    cursor.getInt(9)
+            );
+            cursor.close();
+            db.close();
+            return exercise;
+        }
+        cursor.close();
+        db.close();
+        return null;
     }
 
     public List<Exercise> getExercisesByDate(String date) {
@@ -268,7 +376,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = db.query(TABLE_EXERCISES,
                 new String[]{COLUMN_EXERCISE_ID, COLUMN_USER_ID, COLUMN_EXERCISE_TYPE, COLUMN_START_TIME,
-                        COLUMN_END_TIME, COLUMN_EXERCISE_DATE, COLUMN_DISTANCE, COLUMN_DURATION, COLUMN_CALORIES_BURNED},
+                        COLUMN_END_TIME, COLUMN_EXERCISE_DATE, COLUMN_DISTANCE, COLUMN_DURATION, COLUMN_CALORIES_BURNED, COLUMN_STEPS},
                 COLUMN_EXERCISE_DATE + " = ?",
                 new String[]{date}, null, null, null);
 
@@ -281,7 +389,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         exerciseDate = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(dateStr);
                     } catch (ParseException e) {
                         Log.e("DatabaseHelper", "Error parsing date: " + dateStr, e);
-                        exerciseDate = null; // Hoặc xử lý khác nếu cần
                     }
                 }
 
@@ -294,7 +401,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         exerciseDate,
                         cursor.getDouble(6),
                         cursor.getLong(7),
-                        cursor.getInt(8)
+                        cursor.getInt(8),
+                        cursor.getInt(9)
                 );
                 exerciseList.add(exercise);
             } while (cursor.moveToNext());
@@ -318,7 +426,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         exerciseDate = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(dateStr);
                     } catch (ParseException e) {
                         Log.e("DatabaseHelper", "Error parsing date: " + dateStr, e);
-                        exerciseDate = null; // Hoặc xử lý khác nếu cần
                     }
                 }
 
@@ -331,7 +438,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         exerciseDate,
                         cursor.getDouble(6),
                         cursor.getLong(7),
-                        cursor.getInt(8)
+                        cursor.getInt(8),
+                        cursor.getInt(9)
                 );
                 exerciseList.add(exercise);
             } while (cursor.moveToNext());
