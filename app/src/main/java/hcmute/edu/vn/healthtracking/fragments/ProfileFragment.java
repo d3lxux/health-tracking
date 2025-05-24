@@ -11,10 +11,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.healthtracking.R;
@@ -29,6 +37,8 @@ public class ProfileFragment extends Fragment {
     private EditText etName, etAge, etHeight, etWeight;
     private Button btnSave;
 
+    private RadioGroup rgGender;
+    private RadioButton rbMale, rbFemale;
     private String selectedAvatarUri = null;
 
     private DatabaseHelper databaseHelper;
@@ -46,6 +56,9 @@ public class ProfileFragment extends Fragment {
         etHeight = view.findViewById(R.id.et_height);
         etWeight = view.findViewById(R.id.et_weight);
         btnSave = view.findViewById(R.id.btn_save_profile);
+        rgGender = view.findViewById(R.id.rg_gender);
+        rbMale = view.findViewById(R.id.rb_male);
+        rbFemale = view.findViewById(R.id.rb_female);
 
         databaseHelper = new DatabaseHelper(requireContext());
 
@@ -65,18 +78,28 @@ public class ProfileFragment extends Fragment {
             String ageStr = etAge.getText().toString().trim();
             String heightStr = etHeight.getText().toString().trim();
             String weightStr = etWeight.getText().toString().trim();
+            String gender = rbMale.isChecked() ? "Nam" : rbFemale.isChecked() ? "Nữ" : "";
 
-            if (name.isEmpty() || ageStr.isEmpty() || heightStr.isEmpty() || weightStr.isEmpty()) {
-                Toast.makeText(getContext(), "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
-            } else {
+            // Kiểm tra dữ liệu
+            if (name.isEmpty() || ageStr.isEmpty() || heightStr.isEmpty() || weightStr.isEmpty() || gender.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng nhập đầy đủ thông tin và chọn giới tính!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
                 int age = Integer.parseInt(ageStr);
                 float height = Float.parseFloat(heightStr);
                 float weight = Float.parseFloat(weightStr);
 
-                databaseHelper.saveUserProfile(name, age, height, weight, selectedAvatarUri);
+                databaseHelper.saveUserProfile(name, age, height, weight, selectedAvatarUri, gender);
                 Toast.makeText(getContext(), "Đã lưu thông tin cá nhân", Toast.LENGTH_SHORT).show();
+            } catch (NumberFormatException e) {
+                Toast.makeText(getContext(), "Vui lòng nhập đúng định dạng số cho tuổi, chiều cao và cân nặng!", Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
 
         return view;
     }
@@ -87,10 +110,36 @@ public class ProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
             Uri uri = data.getData();
-            selectedAvatarUri = uri.toString();
-            imageProfile.setImageURI(uri);
+            selectedAvatarUri = saveImageToInternalStorage(uri); // lưu ảnh vào bộ nhớ nội bộ và lấy đường dẫn
+            if (selectedAvatarUri != null) {
+                imageProfile.setImageURI(Uri.fromFile(new File(selectedAvatarUri)));
+            }
         }
     }
+
+
+    private String saveImageToInternalStorage(Uri uri) {
+        try {
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(uri);
+            File file = new File(requireContext().getFilesDir(), "avatar.jpg"); // ảnh được lưu trong thư mục riêng của app
+            FileOutputStream outputStream = new FileOutputStream(file);
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+            outputStream.close();
+            inputStream.close();
+
+            return file.getAbsolutePath(); // đường dẫn ảnh lưu để ghi vào database
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     // Tải dữ liệu hồ sơ đã lưu
     private void loadUserProfile() {
@@ -103,8 +152,21 @@ public class ProfileFragment extends Fragment {
 
             if (profile.getAvatarUri() != null) {
                 selectedAvatarUri = profile.getAvatarUri();
-                imageProfile.setImageURI(Uri.parse(selectedAvatarUri));
+                File file = new File(selectedAvatarUri);
+                if (file.exists()) {
+                    imageProfile.setImageURI(Uri.fromFile(file));
+                }
             }
+
+
+            if (profile.getGender() != null) {
+                if (profile.getGender().equalsIgnoreCase("Nam")) {
+                    rbMale.setChecked(true);
+                } else if (profile.getGender().equalsIgnoreCase("Nữ")) {
+                    rbFemale.setChecked(true);
+                }
+            }
+
         }
     }
 }

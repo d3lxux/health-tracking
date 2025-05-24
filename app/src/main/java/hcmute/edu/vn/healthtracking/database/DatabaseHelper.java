@@ -17,7 +17,7 @@ import hcmute.edu.vn.healthtracking.models.UserProfile;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tasks.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_TASKS = "tasks";
     private static final String COLUMN_ID = "id";
@@ -47,26 +47,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "age INTEGER, " +
                 "height REAL, " +
                 "weight REAL, " +
-                "avatar_uri TEXT)";
+                "avatar_uri TEXT,gender TEXT)";
         db.execSQL(createUserProfileTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 2) {
-            db.execSQL("CREATE TABLE IF NOT EXISTS user_profile (" +
-                    "id INTEGER PRIMARY KEY, " +
-                    "name TEXT, " +
-                    "age INTEGER, " +
-                    "height REAL, " +
-                    "weight REAL, " +
-                    "avatar_uri TEXT)");
+            // Đã xử lý
+            db.execSQL("ALTER TABLE user_profile ADD COLUMN gender TEXT");
         }
 
         if (oldVersion < 3) {
-            // future migrations here
+            // Future migrations
         }
     }
+
+
 
 
     // Thêm Task
@@ -188,7 +185,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Lưu thông tin người dùng
-    public void saveUserProfile(String name, int age, float height, float weight, String avatarUri) {
+    public void saveUserProfile(String name, int age, float height, float weight, String avatarUri, String gender) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("id", 1);
@@ -197,6 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("height", height);
         values.put("weight", weight);
         values.put("avatar_uri", avatarUri);
+        values.put("gender", gender);
 
         int rows = db.update("user_profile", values, "id = ?", new String[]{"1"});
         if (rows == 0) {
@@ -204,6 +202,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         db.close();
     }
+
 
 
     // Lấy thông tin người dùng :
@@ -218,7 +217,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     cursor.getInt(cursor.getColumnIndexOrThrow("age")),
                     cursor.getFloat(cursor.getColumnIndexOrThrow("height")),
                     cursor.getFloat(cursor.getColumnIndexOrThrow("weight")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("avatar_uri"))
+                    cursor.getString(cursor.getColumnIndexOrThrow("avatar_uri")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("gender"))
             );
             cursor.close();
             db.close();

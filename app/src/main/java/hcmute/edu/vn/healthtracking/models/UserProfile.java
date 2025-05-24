@@ -6,12 +6,14 @@ public class UserProfile {
     private float height;
     private float weight;
     private String avatarUri;
-    public UserProfile(String name, int age, float height, float weight, String avatarUri) {
+    private String gender;
+    public UserProfile(String name, int age, float height, float weight, String avatarUri, String gender) {
         this.name = name;
         this.age = age;
         this.height = height;
         this.weight = weight;
         this.avatarUri = avatarUri;
+        this.gender = gender;
     }
 
     // Getter
@@ -22,5 +24,8 @@ public class UserProfile {
 
     public String getAvatarUri() {
         return avatarUri;
+    }
+    public String getGender() {
+        return gender;
     }
 }
