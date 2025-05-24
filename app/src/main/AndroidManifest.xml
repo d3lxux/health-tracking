@@ -9,11 +9,7 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
 
-    <!-- Quyền nhận sự kiện khi thiết bị khởi động lại -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+        <!-- Quyền nhận sự kiện khi thiết bị khởi động lại -->    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />        <!-- Quyền truy cập vị trí cho tracking running -->    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
 
     <!-- Quyền rung khi báo thức kêu -->
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -44,11 +40,7 @@
         <receiver android:name=".receivers.AlarmBroadcastReceiver"
             android:exported="false">
         </receiver>
-        <service
-            android:name=".services.StepTrackingService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="health" />
+                <service            android:name=".services.StepTrackingService"            android:enabled="true"            android:exported="false"            android:foregroundServiceType="health" />                    <service            android:name=".services.RunningTrackingService"            android:enabled="true"            android:exported="false"            android:foregroundServiceType="location" />
     </application>
 
 </manifest>
