@@ -370,6 +370,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    // Add new exercise (for running sessions - allows multiple per day)
+    public long addExercise(Exercise exercise) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_ID, exercise.getUserId());
+        values.put(COLUMN_EXERCISE_TYPE, exercise.getExerciseType());
+        values.put(COLUMN_START_TIME, exercise.getStartTime() != null ? exercise.getStartTime().getTime() : null);
+        values.put(COLUMN_END_TIME, exercise.getEndTime() != null ? exercise.getEndTime().getTime() : null);
+        values.put(COLUMN_EXERCISE_DATE, exercise.getDate() != null ? ExerciseUtils.formatDate(exercise.getDate(), "yyyyMMdd") : null);
+        values.put(COLUMN_DISTANCE, exercise.getDistance());
+        values.put(COLUMN_DURATION, exercise.getDuration());
+        values.put(COLUMN_CALORIES_BURNED, exercise.getCaloriesBurned());
+        values.put(COLUMN_STEPS, exercise.getSteps());
+
+        long exerciseId = db.insert(TABLE_EXERCISES, null, values);
+        Log.d("DatabaseHelper", "Inserted new " + exercise.getExerciseType() + " exercise with ID: " + exerciseId);
+
+        db.close();
+        return exerciseId;
+    }
+
     public List<Exercise> getExercisesByDate(String date) {
         List<Exercise> exerciseList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
