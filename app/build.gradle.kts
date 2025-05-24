@@ -43,14 +43,14 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation(platform(libs.firebase.bom))
     // Add the dependency for the Cloud Storage library
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-storage")
-    implementation("com.google.firebase:firebase-database")
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.database)
     // For efficiency media loading
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation(libs.glide)
+    annotationProcessor(libs.compiler)
     // Media playback
-    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+    implementation(libs.exoplayer)
 }
