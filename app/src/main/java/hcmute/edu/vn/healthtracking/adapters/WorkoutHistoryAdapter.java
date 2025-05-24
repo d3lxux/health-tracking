@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Locale;
 
 import hcmute.edu.vn.healthtracking.R;
 import hcmute.edu.vn.healthtracking.models.WorkoutHistory;
@@ -41,7 +42,7 @@ public class WorkoutHistoryAdapter extends RecyclerView.Adapter<WorkoutHistoryAd
         
         holder.titleTextView.setText(workout.getTitle());
         holder.dateTextView.setText(workout.getDate());
-        holder.distanceTextView.setText(workout.getDistance() + " km");
+        holder.distanceTextView.setText(String.format(Locale.getDefault(), "%.2f km", workout.getDistance()));
         holder.timeTextView.setText(workout.getDuration());
         
         // Set appropriate icon based on workout type

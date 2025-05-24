@@ -15,7 +15,7 @@ public class ExerciseUtils {
 
     // MET values
     private static final double WALKING_MET = 3.5;
-    private static final double RUNNING_MET = 8.0;
+    public static final double RUNNING_MET = 8.0;
     private static final double CYCLING_MET = 6.0;
     private static final double DEFAULT_MET = 4.0;
 
