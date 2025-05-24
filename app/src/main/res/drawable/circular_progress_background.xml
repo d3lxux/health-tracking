@@ -1,5 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#E0E0E0" /> <!-- Màu nền -->
-    <corners android:radius="10dp" />
+    android:shape="ring"
+    android:innerRadiusRatio="3"
+    android:thicknessRatio="12"
+    android:useLevel="false">
+    <solid android:color="#E0E0E0" />
 </shape>

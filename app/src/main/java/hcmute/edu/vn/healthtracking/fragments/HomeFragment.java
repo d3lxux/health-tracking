@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,30 +28,44 @@ import hcmute.edu.vn.healthtracking.utils.ExerciseUtils;
 public class HomeFragment extends Fragment {
 
     private TextView stepsTextView, caloriesTextView, activeMinutesTextView, distanceTextView;
+    private TextView goalStepsTextView, minCaloriesTextView, minDurationTextView; // New TextViews
     private ProgressBar progressBar;
     private DatabaseHelper dbHelper;
     private UserProfile userProfile;
-    private static final int STEP_GOAL = 6000; // Mục tiêu 6000 bước
-    private static final int CALORIE_GOAL = 300; // Mục tiêu 300 kcal
-    private static final int ACTIVE_MINUTES_GOAL = 30; // Mục tiêu 30 phút
+    private static final int STEP_GOAL = 6000; // Goal: 6000 steps
+    private static final int CALORIE_GOAL = 300; // Goal: 300 kcal
+    private static final int ACTIVE_MINUTES_GOAL = 30; // Goal: 30 minutes
     private static final String ACTION_UPDATE_UI = "hcmute.edu.vn.healthtracking.ACTION_UPDATE_UI";
+    private static final String TAG = "HomeFragment";
     private BroadcastReceiver uiUpdateReceiver;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        // Khởi tạo views
+        // Initialize views with null checks
         stepsTextView = view.findViewById(R.id.tv_steps);
+        if (stepsTextView == null) Log.e(TAG, "stepsTextView is null");
         caloriesTextView = view.findViewById(R.id.tv_calories);
+        if (caloriesTextView == null) Log.e(TAG, "caloriesTextView is null");
         activeMinutesTextView = view.findViewById(R.id.tv_active_minutes);
+        if (activeMinutesTextView == null) Log.e(TAG, "activeMinutesTextView is null");
         distanceTextView = view.findViewById(R.id.tv_distance);
+        if (distanceTextView == null) Log.e(TAG, "distanceTextView is null");
         progressBar = view.findViewById(R.id.progress_bar);
+        if (progressBar == null) Log.e(TAG, "progressBar is null");
+        // Initialize new TextViews
+        goalStepsTextView = view.findViewById(R.id.tv_goal_steps);
+        if (goalStepsTextView == null) Log.e(TAG, "minStepsTextView is null");
+        minCaloriesTextView = view.findViewById(R.id.minCalories);
+        if (minCaloriesTextView == null) Log.e(TAG, "minCaloriesTextView is null");
+        minDurationTextView = view.findViewById(R.id.minDuration);
+        if (minDurationTextView == null) Log.e(TAG, "minDurationTextView is null");
 
-        // Khởi tạo database
+        // Initialize database
         dbHelper = new DatabaseHelper(requireContext());
 
-        // Lấy thông tin người dùng
+        // Get user profile
         userProfile = dbHelper.getUserProfile();
         if (userProfile == null) {
             userProfile = new UserProfile("Default User", 30, 170.0f, 70.0f, null);
@@ -72,7 +87,7 @@ public class HomeFragment extends Fragment {
         IntentFilter filter = new IntentFilter(ACTION_UPDATE_UI);
         requireContext().registerReceiver(uiUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
-        // Cập nhật giao diện
+        // Update UI
         updateUI();
 
         return view;
@@ -88,10 +103,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateUI() {
-        // Lấy ngày hiện tại
+        // Get current date (e.g., 20250524 for May 24, 2025)
         String today = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
 
-        // Lấy bài tập Walking hôm nay
+        // Get today's Walking exercise
         Exercise walkingExercise = dbHelper.getWalkingExerciseByDate(today);
 
         // Calculate total steps (Walking + Running)
@@ -107,17 +122,42 @@ public class HomeFragment extends Fragment {
             totalDistance = walkingExercise.getDistance();
         }
 
-        // Chuyển đổi duration sang phút
-        int totalActiveMinutes = (int) (totalDuration / (1000 * 60));
+        // Convert duration to minutes
+//        int totalActiveMinutes = (int) (totalDuration / (1000 * 60));
+        int totalActiveMinutes = 0;
 
-        // Cập nhật giao diện
-        stepsTextView.setText(String.format(Locale.getDefault(), "%d", totalSteps));
-        caloriesTextView.setText(String.format(Locale.getDefault(), "%d", totalCalories));
-        activeMinutesTextView.setText(String.format(Locale.getDefault(), "%d", totalActiveMinutes));
-        distanceTextView.setText(String.format(Locale.getDefault(), "%.2f", totalDistance));
+        // Update existing UI with null checks
+        if (stepsTextView != null)
+            stepsTextView.setText(String.format(Locale.getDefault(), "%d", totalSteps));
+        if (caloriesTextView != null)
+            caloriesTextView.setText(String.format(Locale.getDefault(), "%d", totalCalories));
+        if (activeMinutesTextView != null)
+            activeMinutesTextView.setText(String.format(Locale.getDefault(), "%d", totalActiveMinutes));
+        if (distanceTextView != null)
+            distanceTextView.setText(String.format(Locale.getDefault(), "%.2f", totalDistance));
 
-        // Cập nhật ProgressBar dựa trên số bước
-        int progress = (int) ((totalSteps / (float) STEP_GOAL) * 100);
-        progressBar.setProgress(Math.min(progress, 100));
+        // Update ProgressBar based on steps
+        if (progressBar != null) {
+            int progress = (int) ((totalSteps / (float) STEP_GOAL) * 2000);
+            progressBar.setProgress(Math.min(progress, 100));
+        }
+
+        // Calculate minimum metrics (assuming Male gender for simplicity)
+        ExerciseUtils.Gender gender = ExerciseUtils.Gender.MALE; // Default assumption
+        float weight = userProfile.getWeight();
+        int height = (int) userProfile.getHeight(); // Convert to int (cm)
+        int age = userProfile.getAge();
+
+        int minCalories = ExerciseUtils.calculateTDEE(weight, height, age, gender);
+        int minSteps = ExerciseUtils.calculateMinStepsPerDay(minCalories, gender);
+        int minActiveMinutes = ExerciseUtils.getMinActiveMinutesPerDay();
+
+        // Update new TextViews with minimum values
+        if (goalStepsTextView != null)
+            goalStepsTextView.setText(String.format(Locale.getDefault(), "Goal: %d steps", minSteps));
+        if (minCaloriesTextView != null)
+            minCaloriesTextView.setText(String.format(Locale.getDefault(), "Goal: %d kcal", minCalories));
+        if (minDurationTextView != null)
+            minDurationTextView.setText(String.format(Locale.getDefault(), "Goal: %d min", minActiveMinutes));
     }
 }
