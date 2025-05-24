@@ -171,7 +171,7 @@ public class RunningFragment extends Fragment {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 requireContext().registerReceiver(runningUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
             } else {
-                requireContext().registerReceiver(runningUpdateReceiver, filter);
+                ContextCompat.registerReceiver(requireContext(), runningUpdateReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
             }
             
             // Also register for local broadcasts

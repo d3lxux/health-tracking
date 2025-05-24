@@ -40,7 +40,22 @@
         <receiver android:name=".receivers.AlarmBroadcastReceiver"
             android:exported="false">
         </receiver>
-                <service            android:name=".services.StepTrackingService"            android:enabled="true"            android:exported="false"            android:foregroundServiceType="health" />                    <service            android:name=".services.RunningTrackingService"            android:enabled="true"            android:exported="false"            android:foregroundServiceType="location" />
+                <service
+                    android:name=".services.StepTrackingService"
+                    android:enabled="true"
+                    android:exported="false"
+                    android:foregroundServiceType="health" />
+        <service
+            android:name=".services.RunningTrackingService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+        
+        <service
+            android:name=".services.CyclingTrackingService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
     </application>
 
 </manifest>
