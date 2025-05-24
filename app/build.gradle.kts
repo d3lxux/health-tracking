@@ -53,4 +53,11 @@ dependencies {
     annotationProcessor(libs.compiler)
     // Media playback
     implementation(libs.exoplayer)
+    // Add the dependency for the Firebase AI Logic library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation(libs.firebase.ai)
+    // Required for one-shot operations (to use `ListenableFuture` from Guava Android)
+    implementation(libs.guava)
+    // Required for streaming operations (to use `Publisher` from Reactive Streams)
+    implementation(libs.reactive.streams)
 }
