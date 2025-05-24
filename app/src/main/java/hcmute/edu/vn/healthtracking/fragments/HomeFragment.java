@@ -138,7 +138,7 @@ public class HomeFragment extends Fragment {
 
         // Update ProgressBar based on steps
         if (progressBar != null) {
-            int progress = (int) ((totalSteps / (float) STEP_GOAL) * 2000);
+            int progress = (int) ((totalSteps / (float) STEP_GOAL) * 100);
             progressBar.setProgress(Math.min(progress, 100));
         }
 
