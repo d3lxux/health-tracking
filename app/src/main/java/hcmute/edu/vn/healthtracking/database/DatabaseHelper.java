@@ -22,7 +22,7 @@ import hcmute.edu.vn.healthtracking.utils.ExerciseUtils;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tasks.db";
-    private static final int DATABASE_VERSION = 5; // Incremented for steps column
+    private static final int DATABASE_VERSION = 6; // Incremented to remove UNIQUE constraint
 
     // Bảng tasks
     private static final String TABLE_TASKS = "tasks";
@@ -78,8 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_DISTANCE + " REAL, " +
                 COLUMN_DURATION + " INTEGER, " +
                 COLUMN_CALORIES_BURNED + " INTEGER, " +
-                COLUMN_STEPS + " INTEGER, " +
-                "UNIQUE(" + COLUMN_EXERCISE_DATE + ", " + COLUMN_EXERCISE_TYPE + "))";
+                COLUMN_STEPS + " INTEGER)";
         db.execSQL(createExerciseTable);
     }
 
@@ -149,6 +148,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (oldVersion < 5) {
             db.execSQL("ALTER TABLE " + TABLE_EXERCISES + " ADD COLUMN " + COLUMN_STEPS + " INTEGER DEFAULT 0");
+        }
+        if (oldVersion < 6) {
+            // Remove UNIQUE constraint to allow multiple sessions per day
+            db.execSQL("CREATE TABLE exercises_new (" +
+                    COLUMN_EXERCISE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_USER_ID + " TEXT, " +
+                    COLUMN_EXERCISE_TYPE + " TEXT, " +
+                    COLUMN_START_TIME + " INTEGER, " +
+                    COLUMN_END_TIME + " INTEGER, " +
+                    COLUMN_EXERCISE_DATE + " TEXT, " +
+                    COLUMN_DISTANCE + " REAL, " +
+                    COLUMN_DURATION + " INTEGER, " +
+                    COLUMN_CALORIES_BURNED + " INTEGER, " +
+                    COLUMN_STEPS + " INTEGER)"); // No UNIQUE constraint
+
+            // Copy all existing data
+            db.execSQL("INSERT INTO exercises_new SELECT * FROM " + TABLE_EXERCISES);
+            
+            // Replace old table
+            db.execSQL("DROP TABLE " + TABLE_EXERCISES);
+            db.execSQL("ALTER TABLE exercises_new RENAME TO " + TABLE_EXERCISES);
         }
     }
 
