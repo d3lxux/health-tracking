@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-black"
         android:text="Title"
+        android:textColor="@color/black"
         android:layout_marginTop="15dp"
 
         android:layout_marginStart="25dp"
@@ -49,7 +50,7 @@
         android:textAlignment="center"
         android:layout_marginTop="35dp"
         android:textSize="13dp"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/green"
         android:text="Time" />
 
     <Button
@@ -59,6 +60,6 @@
         android:layout_marginStart="25dp"
         android:layout_marginTop="80dp"
         android:layout_marginEnd="25dp"
-        android:backgroundTint="@color/colorAccent"
+        android:backgroundTint="@color/green"
         android:text="Close" />
 </LinearLayout>
