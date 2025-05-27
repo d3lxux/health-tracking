@@ -1,5 +1,7 @@
 package hcmute.edu.vn.healthtracking.services;
 
+import static java.security.AccessController.getContext;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -18,6 +20,7 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.Date;
 
@@ -162,23 +165,20 @@ public class RunningTrackingService extends Service implements LocationListener 
         Log.d(TAG, "Stopping running tracking");
         isTracking = false;
 
-        // Stop location updates
         locationManager.removeUpdates(this);
-        
-        // Stop timer
         stopTimer();
-
-        // Save to database
         saveRunningSession();
-        
-        // Broadcast final state
         broadcastUpdate();
-        
-        // Stop foreground service
+
         stopForeground(true);
         stopSelf();
-    }
 
+        // Send broadcast to update UI
+        Intent updateIntent = new Intent("hcmute.edu.vn.healthtracking.ACTION_UPDATE_UI");
+        sendBroadcast(updateIntent);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
+        Log.d("RunningFragment", "Sent ACTION_UPDATE_UI broadcast to refresh HomeFragment");
+    }
     private void startTimer() {
         timerRunnable = new Runnable() {
             @Override

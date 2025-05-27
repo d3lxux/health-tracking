@@ -489,4 +489,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return exerciseList;
     }
+    // Calculate total calories for all exercises on a specific date
+    
+    public int getTotalCaloriesByDate(String date) {
+        List<Exercise> exercises = getExercisesByDate(date);
+        int totalCalories = 0;
+        for (Exercise exercise : exercises) {
+            totalCalories += exercise.getCaloriesBurned();
+        }
+        Log.d("DatabaseHelper", "Total calories for date " + date + ": " + totalCalories);
+        return totalCalories;
+    }
+
+    // Calculate total distance for all exercises on a specific date
+    public double getTotalDistanceByDate(String date) {
+        List<Exercise> exercises = getExercisesByDate(date);
+        double totalDistance = 0.0;
+        for (Exercise exercise : exercises) {
+            totalDistance += exercise.getDistance();
+        }
+        Log.d("DatabaseHelper", "Total distance for date " + date + ": " + totalDistance + " km");
+        return totalDistance;
+    }
+
+    // Calculate total duration for all exercises on a specific date
+    public long getTotalDurationByDate(String date) {
+        List<Exercise> exercises = getExercisesByDate(date);
+        long totalDuration = 0;
+        for (Exercise exercise : exercises) {
+            totalDuration += exercise.getDuration();
+        }
+        Log.d("DatabaseHelper", "Total duration for date " + date + ": " + totalDuration + " ms");
+        return totalDuration;
+    }
 }
+

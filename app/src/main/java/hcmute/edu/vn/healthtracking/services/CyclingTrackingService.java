@@ -18,6 +18,7 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.Date;
 
@@ -181,6 +182,10 @@ public class CyclingTrackingService extends Service implements LocationListener 
         // Stop foreground service
         stopForeground(true);
         stopSelf();
+        Intent updateIntent = new Intent("hcmute.edu.vn.healthtracking.ACTION_UPDATE_UI");
+        sendBroadcast(updateIntent);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(updateIntent);
+        Log.d("CyclingFragment4", "Sent ACTION_UPDATE_UI broadcast to refresh HomeFragment");
     }
 
     private void startTimer() {

@@ -22,6 +22,8 @@ import hcmute.edu.vn.healthtracking.R;
 import hcmute.edu.vn.healthtracking.database.DatabaseHelper;
 import hcmute.edu.vn.healthtracking.models.Exercise;
 import hcmute.edu.vn.healthtracking.models.UserProfile;
+import hcmute.edu.vn.healthtracking.services.CyclingTrackingService;
+import hcmute.edu.vn.healthtracking.services.RunningTrackingService;
 import hcmute.edu.vn.healthtracking.services.StepTrackingService;
 import hcmute.edu.vn.healthtracking.utils.ExerciseUtils;
 
@@ -84,7 +86,11 @@ public class HomeFragment extends Fragment {
                 updateUI();
             }
         };
-        IntentFilter filter = new IntentFilter(ACTION_UPDATE_UI);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_UPDATE_UI);
+        filter.addAction(CyclingTrackingService.ACTION_UPDATE_CYCLING_UI);
+        filter.addAction(RunningTrackingService.ACTION_UPDATE_RUNNING_UI);
+        requireContext().registerReceiver(uiUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
         requireContext().registerReceiver(uiUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
         // Update UI
@@ -101,30 +107,20 @@ public class HomeFragment extends Fragment {
             uiUpdateReceiver = null;
         }
     }
-
     private void updateUI() {
         // Get current date (e.g., 20250524 for May 24, 2025)
         String today = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
 
-        // Get today's Walking exercise
-        Exercise walkingExercise = dbHelper.getWalkingExerciseByDate(today);
-
         // Calculate total steps (Walking + Running)
         int totalSteps = ExerciseUtils.getTotalSteps(new Date(), dbHelper);
 
-        int totalCalories = 0;
-        long totalDuration = 0; // milliseconds
-        double totalDistance = 0.0;
-
-        if (walkingExercise != null) {
-            totalCalories = walkingExercise.getCaloriesBurned();
-            totalDuration = walkingExercise.getDuration();
-            totalDistance = walkingExercise.getDistance();
-        }
+        // Calculate totals for all exercises
+        int totalCalories = dbHelper.getTotalCaloriesByDate(today);
+        double totalDistance = dbHelper.getTotalDistanceByDate(today);
+        long totalDuration = dbHelper.getTotalDurationByDate(today);
 
         // Convert duration to minutes
-//        int totalActiveMinutes = (int) (totalDuration / (1000 * 60));
-        int totalActiveMinutes = 0;
+        int totalActiveMinutes = (int) (totalDuration / (1000 * 60));
 
         // Update existing UI with null checks
         if (stepsTextView != null)
@@ -160,4 +156,63 @@ public class HomeFragment extends Fragment {
         if (minDurationTextView != null)
             minDurationTextView.setText(String.format(Locale.getDefault(), "Goal: %d min", minActiveMinutes));
     }
+
+//    private void updateUI() {
+//        // Get current date (e.g., 20250524 for May 24, 2025)
+//        String today = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
+//
+//        // Get today's Walking exercise
+//        Exercise walkingExercise = dbHelper.getWalkingExerciseByDate(today);
+//
+//        // Calculate total steps (Walking + Running)
+//        int totalSteps = ExerciseUtils.getTotalSteps(new Date(), dbHelper);
+//
+//        int totalCalories = 0;
+//        long totalDuration = 0; // milliseconds
+//        double totalDistance = 0.0;
+//
+//        if (walkingExercise != null) {
+//            totalCalories = walkingExercise.getCaloriesBurned();
+//            totalDuration = walkingExercise.getDuration();
+//            totalDistance = walkingExercise.getDistance();
+//        }
+//
+//        // Convert duration to minutes
+////        int totalActiveMinutes = (int) (totalDuration / (1000 * 60));
+//        int totalActiveMinutes = 0;
+//
+//        // Update existing UI with null checks
+//        if (stepsTextView != null)
+//            stepsTextView.setText(String.format(Locale.getDefault(), "%d", totalSteps));
+//        if (caloriesTextView != null)
+//            caloriesTextView.setText(String.format(Locale.getDefault(), "%d", totalCalories));
+//        if (activeMinutesTextView != null)
+//            activeMinutesTextView.setText(String.format(Locale.getDefault(), "%d", totalActiveMinutes));
+//        if (distanceTextView != null)
+//            distanceTextView.setText(String.format(Locale.getDefault(), "%.2f", totalDistance));
+//
+//        // Update ProgressBar based on steps
+//        if (progressBar != null) {
+//            int progress = (int) ((totalSteps / (float) STEP_GOAL) * 100);
+//            progressBar.setProgress(Math.min(progress, 100));
+//        }
+//
+//        // Calculate minimum metrics (assuming Male gender for simplicity)
+//        ExerciseUtils.Gender gender = ExerciseUtils.Gender.MALE; // Default assumption
+//        float weight = userProfile.getWeight();
+//        int height = (int) userProfile.getHeight(); // Convert to int (cm)
+//        int age = userProfile.getAge();
+//
+//        int minCalories = ExerciseUtils.calculateTDEE(weight, height, age, gender);
+//        int minSteps = ExerciseUtils.calculateMinStepsPerDay(minCalories, gender);
+//        int minActiveMinutes = ExerciseUtils.getMinActiveMinutesPerDay();
+//
+//        // Update new TextViews with minimum values
+//        if (goalStepsTextView != null)
+//            goalStepsTextView.setText(String.format(Locale.getDefault(), "Goal: %d steps", minSteps));
+//        if (minCaloriesTextView != null)
+//            minCaloriesTextView.setText(String.format(Locale.getDefault(), "Goal: %d kcal", minCalories));
+//        if (minDurationTextView != null)
+//            minDurationTextView.setText(String.format(Locale.getDefault(), "Goal: %d min", minActiveMinutes));
+//    }
 }
