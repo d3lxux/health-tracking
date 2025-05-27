@@ -7,4 +7,7 @@
     <color name="colorAccent">#4885ed</color>
     <color name="colorRed">#FF0000</color>
     <color name="colorRedLight">#E53935</color>
+    <color name="colorBlackblue">#18252B</color>
+    <color name="colorCard">#2A3435</color>
+    <color name="green">#09B340</color>
 </resources>
