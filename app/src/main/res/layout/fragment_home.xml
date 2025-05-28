@@ -214,8 +214,7 @@
                             android:layout_height="wrap_content"
                             android:text="/km"
                             android:textColor="@color/white"
-                            android:textSize="16sp"
-                            />
+                            android:textSize="16sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
