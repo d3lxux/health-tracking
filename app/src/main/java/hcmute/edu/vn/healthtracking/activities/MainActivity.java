@@ -27,8 +27,9 @@ import hcmute.edu.vn.healthtracking.fragments.ProfileFragment;
 import hcmute.edu.vn.healthtracking.fragments.UploadFragment;
 
 public class MainActivity extends AppCompatActivity {
+    // Variables to handle touch case
     private float dX, dY;
-    private float lastAction;
+    private boolean isClick;
     private FloatingActionButton chatFab;
 
     @Override
@@ -96,32 +97,48 @@ public class MainActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         dX = view.getX() - event.getRawX();
                         dY = view.getY() - event.getRawY();
-                        lastAction = event.getAction();
+                        isClick = true; // Assume it's a click initially
                         break;
 
                     case MotionEvent.ACTION_MOVE:
+                        // If the finger moves, it's no longer a pure click
+                        isClick = false;
+
                         float newX = event.getRawX() + dX;
                         float newY = event.getRawY() + dY;
 
                         // Ensure the FAB stays within screen bounds
-                        newX = Math.max(0, Math.min(newX, ((View) view.getParent()).getWidth() - view.getWidth()));
-                        newY = Math.max(0, Math.min(newY, ((View) view.getParent()).getHeight() - view.getHeight()));
+                        // Need to cast view.getParent() to View
+                        View parentView = (View) view.getParent();
+                        if (parentView != null) {
+                            newX = Math.max(0, Math.min(newX, parentView.getWidth() - view.getWidth()));
+                            newY = Math.max(0, Math.min(newY, parentView.getHeight() - view.getHeight()));
+                        } else {
+                            // Fallback if parent is null
+                            newX = Math.max(0, newX);
+                            newY = Math.max(0, newY);
+                        }
+
 
                         view.setX(newX);
                         view.setY(newY);
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        if (lastAction == MotionEvent.ACTION_DOWN) {
-                            // This was a click (tap) event
+                        if (isClick) {
                             Intent intent = new Intent(MainActivity.this, ChatActivity.class);
                             startActivity(intent);
                         }
                         break;
 
+                    case MotionEvent.ACTION_CANCEL:
+                        isClick = false;
+                        break;
+
                     default:
                         return false;
                 }
+
                 return true;
             }
         });
