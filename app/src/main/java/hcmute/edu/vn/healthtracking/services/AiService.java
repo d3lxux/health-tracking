@@ -1,6 +1,7 @@
 package hcmute.edu.vn.healthtracking.services;
 
 import android.content.Context;
+import android.location.Location;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -9,7 +10,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.ai.FirebaseAI;
-import com.google.firebase.ai.GenerativeModel;
 import com.google.firebase.ai.java.ChatFutures;
 import com.google.firebase.ai.java.GenerativeModelFutures;
 import com.google.firebase.ai.type.Content;
@@ -20,13 +20,22 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 public class AiService {
-    // Initialize the Gemini Developer API backend service
-    private static final GenerativeModel ai = FirebaseAI.getInstance(GenerativeBackend.googleAI())
-            .generativeModel("gemini-2.0-flash");
-
     // Use the GenerativeModelFutures Java compatibility layer which offers
     // support for ListenableFuture and Publisher APIs
-    private static final GenerativeModelFutures model = GenerativeModelFutures.from(ai);
+    private static final GenerativeModelFutures model = GenerativeModelFutures.from(
+            FirebaseAI.getInstance(GenerativeBackend.googleAI())
+                    .generativeModel(
+                            "gemini-2.0-flash",
+                            null,
+                            null,
+                            null,
+                            null,
+                            new Content.Builder().addText("You are a helpful and empathetic health assistant. " +
+                                    "Your primary goal is to provide accurate and general health information, " +
+                                    "wellness tips, and answer questions related to health and lifestyle. " +
+                                    "Do not give medical advice, diagnose conditions, or prescribe treatments. " +
+                                    "Always advise users to consult a qualified healthcare professional for personal medical concerns. " +
+                                    "Maintain a positive, encouraging, and supportive tone.").build()));
 
     // Chat history
     private static ChatFutures chatSession;
@@ -72,6 +81,7 @@ public class AiService {
 
         // Generate content asynchronously
         ListenableFuture<GenerateContentResponse> response = chatSession.sendMessage(prompt);
+
         Futures.addCallback(response, new FutureCallback<>() {
             @Override
             public void onSuccess(GenerateContentResponse result) {
