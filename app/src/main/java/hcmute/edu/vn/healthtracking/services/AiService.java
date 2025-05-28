@@ -1,47 +1,87 @@
 package hcmute.edu.vn.healthtracking.services;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.ai.FirebaseAI;
 import com.google.firebase.ai.GenerativeModel;
+import com.google.firebase.ai.java.ChatFutures;
 import com.google.firebase.ai.java.GenerativeModelFutures;
 import com.google.firebase.ai.type.Content;
 import com.google.firebase.ai.type.GenerateContentResponse;
 import com.google.firebase.ai.type.GenerativeBackend;
-import com.google.common.util.concurrent.MoreExecutors;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 
 public class AiService {
     // Initialize the Gemini Developer API backend service
-    GenerativeModel ai = FirebaseAI.getInstance(GenerativeBackend.googleAI())
+    private static final GenerativeModel ai = FirebaseAI.getInstance(GenerativeBackend.googleAI())
             .generativeModel("gemini-2.0-flash");
 
-    GenerativeModelFutures model = GenerativeModelFutures.from(ai);
-    private final Executor mainExecutor = MoreExecutors.directExecutor();
+    // Use the GenerativeModelFutures Java compatibility layer which offers
+    // support for ListenableFuture and Publisher APIs
+    private static final GenerativeModelFutures model = GenerativeModelFutures.from(ai);
+
+    // Chat history
+    private static ChatFutures chatSession;
+
+    // Executor to execute call back
+    private final Executor mainExecutor;
+
+    public AiService(Context context) {
+        mainExecutor = ContextCompat.getMainExecutor(context);
+    }
+
+    // Start a new chat session
+    // This should be called before using
+    private void startNewChat() {
+        // The initial greeting for the AI model's context.
+        // This is only for the AI's internal history, not for the UI
+        List<Content> history = List.of(new Content.Builder().
+                setRole("model").
+                addText("Hello! I'm your health assistant. How can I help you today?").
+                build());
+        chatSession = model.startChat(history);
+    }
 
     // Callback interface to handle the result
     public interface ChatCallback {
         void onSuccess(String result);
+
         void onFailure(Throwable t);
     }
 
+    // Create a chat to model
     public void createChat(String input, ChatCallback callback) {
+        // Ensure a chat session exists before sending messages
+        if (chatSession == null) {
+            this.startNewChat();
+        }
+
         // Provide a prompt that contains text
         Content prompt = new Content.Builder()
+                .setRole("user")
                 .addText(input)
                 .build();
 
         // Generate content asynchronously
-        ListenableFuture<GenerateContentResponse> response = model.generateContent(prompt);
-        Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+        ListenableFuture<GenerateContentResponse> response = chatSession.sendMessage(prompt);
+        Futures.addCallback(response, new FutureCallback<>() {
             @Override
             public void onSuccess(GenerateContentResponse result) {
                 String resultText = result.getText();
-                callback.onSuccess(resultText);
+                if (resultText != null && !resultText.isEmpty()) {
+                    callback.onSuccess(resultText);
+                } else {
+                    String warnMessage = "AI response text was null or empty.";
+                    callback.onFailure(new IllegalStateException(warnMessage));
+                }
             }
 
             @Override
