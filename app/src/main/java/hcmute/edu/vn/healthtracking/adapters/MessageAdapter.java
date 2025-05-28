@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,7 +20,7 @@ import io.noties.markwon.Markwon;
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
     private final List<Message> messageList;
-    private final Markwon markwon; // Declare Markwon instance
+    private final Markwon markwon;
 
     public MessageAdapter(List<Message> messageList, Context context) {
         this.messageList = messageList;
@@ -38,13 +39,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Message message = messageList.get(position);
         if (message.getSentBy() == Message.SENT_BY_USER) {
-            holder.leftChatView.setVisibility(View.GONE);
+            holder.botMessageContainer.setVisibility(View.GONE);
             holder.rightChatView.setVisibility(View.VISIBLE);
             holder.rightChatView.setText(message.getMessage());
         } else {
-            markwon.setMarkdown(holder.leftChatView, message.getMessage());
             holder.rightChatView.setVisibility(View.GONE);
+            holder.botMessageContainer.setVisibility(View.VISIBLE);
             holder.leftChatView.setVisibility(View.VISIBLE);
+            markwon.setMarkdown(holder.leftChatView, message.getMessage());
         }
     }
 
@@ -55,11 +57,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         TextView leftChatView, rightChatView;
+        LinearLayout botMessageContainer;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             leftChatView = itemView.findViewById(R.id.leftChatTextView);
             rightChatView = itemView.findViewById(R.id.rightChatTextView);
+            botMessageContainer = itemView.findViewById(R.id.botMessageContainer);
         }
     }
 } 
