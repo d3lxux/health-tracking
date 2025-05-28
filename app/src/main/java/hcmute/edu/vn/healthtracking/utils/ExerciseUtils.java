@@ -83,16 +83,37 @@ public class ExerciseUtils {
         String type = exercise.getExerciseType();
         long duration = exercise.getDuration();
 
-        if (type == null || duration <= 0) {
+        if (type == null || (!type.equalsIgnoreCase("WALKING") && duration <= 0)) {
             Log.d("ExerciseUtils", "Invalid exercise type or duration for calorie calculation");
             return 0;
         }
 
+        if (type.equalsIgnoreCase("WALKING")) {
+            int steps = exercise.getSteps();
+            double caloriesPer1000Steps;
+
+            if (weightKg <= 50) {
+                caloriesPer1000Steps = 32;
+            } else if (weightKg <= 60) {
+                caloriesPer1000Steps = 38;
+            } else if (weightKg <= 70) {
+                caloriesPer1000Steps = 45;
+            } else if (weightKg <= 80) {
+                caloriesPer1000Steps = 52;
+            } else if (weightKg <= 90) {
+                caloriesPer1000Steps = 60;
+            } else {
+                caloriesPer1000Steps = 68;
+            }
+
+            int calories = (int) ((steps / 1000.0) * caloriesPer1000Steps);
+            Log.d("ExerciseUtils", "Calculated walking calories: " + calories + " for " + steps + " steps, weight: " + weightKg + "kg");
+            return calories;
+        }
+
+        // Các loại bài tập khác dùng công thức MET
         double metValue;
         switch (type.toUpperCase()) {
-            case "WALKING":
-                metValue = WALKING_MET;
-                break;
             case "RUNNING":
                 metValue = RUNNING_MET;
                 break;

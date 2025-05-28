@@ -164,7 +164,7 @@ public class StepTrackingService extends Service implements SensorEventListener 
 
         // Calculate metrics
         double distance = stepsTaken / 1100.0; // km
-        long currentTime = System.currentTimeMillis();
+
         // Update or create exercise record
         Exercise existingExercise = dbHelper.getWalkingExerciseByDate(currentDateStr);
         Exercise exercise;
@@ -172,21 +172,24 @@ public class StepTrackingService extends Service implements SensorEventListener 
             exercise = existingExercise;
             exercise.setSteps(exercise.getSteps() + stepsTaken);
             exercise.setDistance(exercise.getDistance() + distance);
-            exercise.setEndTime(new Date(currentTime));
+            exercise.setDuration(0); // Set duration to 0 for WALKING
+            exercise.setStartTime(null); // Set startTime to null for WALKING
+            exercise.setEndTime(null); // Set endTime to null for WALKING
             Log.d("StepTrackingService", "Updated exercise - Steps: " + exercise.getSteps() +
-                    ", Distance: " + exercise.getDistance() + " km");
+                    ", Distance: " + exercise.getDistance() + " km, Duration: 0 seconds");
         } else {
             exercise = new Exercise(
                     "user1",
                     "WALKING",
-                    new Date(startTimeMillis),
-                    new Date(currentTime),
+                    null, // Set startTime to null
+                    null, // Set endTime to null
                     currentDate,
                     distance,
                     stepsTaken
             );
+            exercise.setDuration(0); // Set duration to 0
             Log.d("StepTrackingService", "Created exercise - Steps: " + stepsTaken +
-                    ", Distance: " + distance + " km");
+                    ", Distance: " + distance + " km, Duration: 0 seconds");
         }
 
         // Calculate calories
@@ -201,8 +204,8 @@ public class StepTrackingService extends Service implements SensorEventListener 
         sendBroadcast(intent);
         Log.d("StepTrackingService", "Broadcast sent for UI update");
 
-        // Update start time
-        startTimeMillis = currentTime;
+        // Update start time (still needed for date change detection)
+        startTimeMillis = System.currentTimeMillis();
     }
 
     @Override
@@ -306,7 +309,6 @@ public class StepTrackingService extends Service implements SensorEventListener 
 
         // Calculate metrics
         double distance = stepsTaken / 1100.0; // km
-        long currentTime = System.currentTimeMillis();
 
         // Update or create exercise
         Exercise existingExercise = dbHelper.getWalkingExerciseByDate(currentDateStr);
@@ -315,21 +317,24 @@ public class StepTrackingService extends Service implements SensorEventListener 
             exercise = existingExercise;
             exercise.setSteps(exercise.getSteps() + stepsTaken);
             exercise.setDistance(exercise.getDistance() + distance);
-            exercise.setEndTime(new Date(currentTime));
+            exercise.setDuration(0); // Set duration to 0 for WALKING
+            exercise.setStartTime(null); // Set startTime to null for WALKING
+            exercise.setEndTime(null); // Set endTime to null for WALKING
             Log.d("StepTrackingService", "Updated exercise - Steps: " + exercise.getSteps() +
-                    ", Distance: " + exercise.getDistance() + " km");
+                    ", Distance: " + exercise.getDistance() + " km, Duration: 0 seconds");
         } else {
             exercise = new Exercise(
                     "user1",
                     "WALKING",
-                    new Date(startTimeMillis),
-                    new Date(currentTime),
+                    null, // Set startTime to null
+                    null, // Set endTime to null
                     currentDate,
                     distance,
                     stepsTaken
             );
+            exercise.setDuration(0); // Set duration to 0
             Log.d("StepTrackingService", "Created exercise - Steps: " + stepsTaken +
-                    ", Distance: " + distance + " km");
+                    ", Distance: " + distance + " km, Duration: 0 seconds");
         }
 
         // Calculate calories
@@ -344,7 +349,7 @@ public class StepTrackingService extends Service implements SensorEventListener 
         sendBroadcast(intent);
         Log.d("StepTrackingService", "Broadcast sent for UI update");
 
-        // Update start time
-        startTimeMillis = currentTime;
+        // Update start time (still needed for date change detection)
+        startTimeMillis = System.currentTimeMillis();
     }
 }
