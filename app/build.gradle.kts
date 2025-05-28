@@ -60,4 +60,6 @@ dependencies {
     implementation(libs.guava)
     // Required for streaming operations (to use `Publisher` from Reactive Streams)
     implementation(libs.reactive.streams)
+    // For core Markdown rendering
+    implementation(libs.core)
 }

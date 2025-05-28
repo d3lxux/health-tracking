@@ -42,7 +42,7 @@ public class ChatActivity extends AppCompatActivity {
 
         // Initialize message list and adapter
         messageList = ChatRepositories.getMessages();
-        messageAdapter = new MessageAdapter(messageList);
+        messageAdapter = new MessageAdapter(messageList, this);
         
         // Set up RecyclerView
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));

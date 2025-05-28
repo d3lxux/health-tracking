@@ -1,5 +1,6 @@
 package hcmute.edu.vn.healthtracking.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +14,16 @@ import java.util.List;
 import hcmute.edu.vn.healthtracking.R;
 import hcmute.edu.vn.healthtracking.models.Message;
 
+import io.noties.markwon.Markwon;
+
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
     private final List<Message> messageList;
+    private final Markwon markwon; // Declare Markwon instance
 
-    public MessageAdapter(List<Message> messageList) {
+    public MessageAdapter(List<Message> messageList, Context context) {
         this.messageList = messageList;
+        markwon = Markwon.builder(context).build();
     }
 
     @NonNull
@@ -37,9 +42,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             holder.rightChatView.setVisibility(View.VISIBLE);
             holder.rightChatView.setText(message.getMessage());
         } else {
+            markwon.setMarkdown(holder.leftChatView, message.getMessage());
             holder.rightChatView.setVisibility(View.GONE);
             holder.leftChatView.setVisibility(View.VISIBLE);
-            holder.leftChatView.setText(message.getMessage());
         }
     }
 
