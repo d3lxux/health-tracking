@@ -59,6 +59,11 @@ public class RunningTrackingService extends Service implements LocationListener 
     private Handler timerHandler;
     private Runnable timerRunnable;
     
+    // GPS noise filtering variables for running
+    private static final double MIN_SPEED_THRESHOLD = 1.0; // 1 km/h minimum speed for running
+    private static final double MAX_REASONABLE_SPEED = 25.0; // 25 km/h maximum reasonable running speed
+    private static final long MIN_TIME_BETWEEN_VALID_UPDATES = 2000; // 2 seconds minimum between valid updates
+    
     // Minimum distance between updates (meters)
     private static final float MIN_DISTANCE_CHANGE = 1.0f;
     // Minimum time between updates (milliseconds)
@@ -274,12 +279,34 @@ public class RunningTrackingService extends Service implements LocationListener 
 
         if (lastLocation != null) {
             float distance = lastLocation.distanceTo(location);
+            long timeDiff = location.getTime() - lastLocation.getTime();
             
-            // Filter out inaccurate readings
-            if (location.getAccuracy() <= 20 && distance >= 1.0f) {
-                totalDistance += distance / 1000.0; // Convert to kilometers
-                Log.d(TAG, "Distance updated: +" + (distance/1000.0) + "km, Total: " + totalDistance + "km");
+            // Calculate current speed for filtering
+            double currentSpeed = 0.0;
+            if (location.hasSpeed() && location.getSpeed() >= 0) {
+                currentSpeed = location.getSpeed() * 3.6; // Convert m/s to km/h
+            } else if (timeDiff > 0) {
+                // Calculate speed from distance and time if GPS speed not available
+                double timeInHours = timeDiff / (1000.0 * 60 * 60);
+                currentSpeed = (distance / 1000.0) / timeInHours;
             }
+            
+            // Apply enhanced filters for running
+            boolean speedFilter = currentSpeed >= MIN_SPEED_THRESHOLD && currentSpeed <= MAX_REASONABLE_SPEED;
+            boolean timeFilter = timeDiff >= MIN_TIME_BETWEEN_VALID_UPDATES;
+            boolean accuracyFilter = location.getAccuracy() <= 15; // Stricter accuracy for running
+            boolean distanceFilter = distance >= 1.0f && distance <= 100.0f; // Reasonable distance range
+            
+            // Filter out inaccurate readings with comprehensive conditions
+            if (accuracyFilter && distanceFilter && speedFilter && timeFilter) {
+                totalDistance += distance / 1000.0; // Convert to kilometers
+                Log.d(TAG, "Distance updated: +" + (distance/1000.0) + "km, Total: " + totalDistance + "km, Speed: " + currentSpeed + "km/h");
+            } else {
+                Log.d(TAG, "Location update filtered out - Accuracy: " + location.getAccuracy() + 
+                        ", Distance: " + distance + "m, Speed: " + currentSpeed + "km/h, TimeDiff: " + timeDiff + "ms");
+            }
+        } else {
+            Log.d(TAG, "First location recorded for running");
         }
         
         lastLocation = location;
