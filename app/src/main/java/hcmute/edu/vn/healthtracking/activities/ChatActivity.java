@@ -14,7 +14,7 @@ import java.util.List;
 import hcmute.edu.vn.healthtracking.R;
 import hcmute.edu.vn.healthtracking.adapters.MessageAdapter;
 import hcmute.edu.vn.healthtracking.models.Message;
-import hcmute.edu.vn.healthtracking.repositories.ChatRepositories;
+import hcmute.edu.vn.healthtracking.repositories.ChatRepository;
 import hcmute.edu.vn.healthtracking.services.AiService;
 
 public class ChatActivity extends AppCompatActivity {
@@ -41,7 +41,7 @@ public class ChatActivity extends AppCompatActivity {
         aiService = new AiService(this);
 
         // Initialize message list and adapter
-        messageList = ChatRepositories.getMessages();
+        messageList = ChatRepository.getMessages();
         messageAdapter = new MessageAdapter(messageList, this);
         
         // Set up RecyclerView

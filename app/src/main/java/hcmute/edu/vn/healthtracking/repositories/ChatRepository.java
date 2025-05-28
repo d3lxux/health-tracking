@@ -5,7 +5,7 @@ import java.util.List;
 
 import hcmute.edu.vn.healthtracking.models.Message;
 
-public class ChatRepositories {
+public class ChatRepository {
     private static List<Message> messages;
 
     public static List<Message> getMessages() {
