@@ -35,7 +35,12 @@ public class AiService {
                                     "wellness tips, and answer questions related to health and lifestyle. " +
                                     "Do not give medical advice, diagnose conditions, or prescribe treatments. " +
                                     "Always advise users to consult a qualified healthcare professional for personal medical concerns. " +
-                                    "Maintain a positive, encouraging, and supportive tone.").build()));
+                                    "Maintain a positive, encouraging, and supportive tone. Here is the user information: " +
+                                    "name: " + "Bien Xuan Huy" + ", " +
+                                    "age: " + "21" + ", " +
+                                    "gender: " + "male" + ", " +
+                                    "weight: " + "65kg" + ", " +
+                                    "height " + "170cm").build()));
 
     // Chat history
     private static ChatFutures chatSession;
