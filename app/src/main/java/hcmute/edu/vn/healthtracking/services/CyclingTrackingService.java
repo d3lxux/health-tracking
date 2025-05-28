@@ -60,6 +60,12 @@ public class CyclingTrackingService extends Service implements LocationListener 
     private Handler timerHandler;
     private Runnable timerRunnable;
     
+    // GPS noise filtering variables
+    private long lastMaxSpeedUpdateTime = 0;
+    private static final long MAX_SPEED_UPDATE_INTERVAL = 3000; // 3 seconds
+    private static final double MIN_SPEED_THRESHOLD = 2.0; // 2 km/h minimum speed to register movement
+    private static final double MAX_REASONABLE_SPEED = 60.0; // 60 km/h maximum reasonable cycling speed
+    
     // Minimum distance between updates (meters)
     private static final float MIN_DISTANCE_CHANGE = 2.0f;
     // Minimum time between updates (milliseconds)
@@ -294,23 +300,45 @@ public class CyclingTrackingService extends Service implements LocationListener 
         Log.d(TAG, "Location changed: " + location.getLatitude() + ", " + location.getLongitude() + 
                 ", Accuracy: " + location.getAccuracy() + ", Speed: " + location.getSpeed());
 
+        // Enhanced GPS noise filtering
         if (lastLocation != null) {
             float distance = lastLocation.distanceTo(location);
+            long timeDiff = location.getTime() - lastLocation.getTime();
             
-            // Filter out inaccurate readings
-            if (location.getAccuracy() <= 20 && distance >= 2.0f) {
+            // Calculate current speed from GPS data
+            double currentSpeed = 0.0;
+            if (location.hasSpeed() && location.getSpeed() >= 0) {
+                currentSpeed = location.getSpeed() * 3.6; // Convert m/s to km/h
+            } else if (timeDiff > 0) {
+                // Calculate speed from distance and time if GPS speed not available
+                double timeInHours = timeDiff / (1000.0 * 60 * 60);
+                currentSpeed = (distance / 1000.0) / timeInHours;
+            }
+            
+            // Apply speed filters
+            boolean speedFilter = currentSpeed >= MIN_SPEED_THRESHOLD && currentSpeed <= MAX_REASONABLE_SPEED;
+            
+            // Filter out inaccurate readings with enhanced conditions
+            if (location.getAccuracy() <= 20 && distance >= 2.0f && speedFilter && timeDiff > 1000) {
                 totalDistance += distance / 1000.0; // Convert to kilometers
-                Log.d(TAG, "Distance updated: +" + (distance/1000.0) + "km, Total: " + totalDistance + "km");
+                Log.d(TAG, "Distance updated: +" + (distance/1000.0) + "km, Total: " + totalDistance + "km, Speed: " + currentSpeed + "km/h");
+                
+                // Update max speed with time restriction (only every 3 seconds)
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastMaxSpeedUpdateTime >= MAX_SPEED_UPDATE_INTERVAL) {
+                    if (currentSpeed > maxSpeed) {
+                        maxSpeed = currentSpeed;
+                        lastMaxSpeedUpdateTime = currentTime;
+                        Log.d(TAG, "New max speed: " + maxSpeed + " km/h");
+                    }
+                }
+            } else {
+                Log.d(TAG, "Location update filtered out - Accuracy: " + location.getAccuracy() + 
+                        ", Distance: " + distance + "m, Speed: " + currentSpeed + "km/h, TimeDiff: " + timeDiff + "ms");
             }
-        }
-        
-        // Calculate speed and update max speed
-        if (location.hasSpeed()) {
-            double currentSpeed = location.getSpeed() * 3.6; // Convert m/s to km/h
-            if (currentSpeed > maxSpeed) {
-                maxSpeed = currentSpeed;
-                Log.d(TAG, "New max speed: " + maxSpeed + " km/h");
-            }
+        } else {
+            // First location, just store it
+            Log.d(TAG, "First location recorded");
         }
         
         lastLocation = location;
