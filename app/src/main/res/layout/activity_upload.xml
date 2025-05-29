@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1C2526">
+
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:id="@+id/rootLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header Section with Icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:padding="6dp"
+                    android:background="@drawable/circle_background"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Create New Post"
+                    android:layout_marginStart="12dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+            <!-- Content Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="20dp">
+
+                <!-- Description Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Share your health journey..."
+                    android:textColorHint="#80FFFFFF"
+                    app:boxStrokeColor="#4CAF50"
+                    app:hintAnimationEnabled="true"
+                    app:hintTextColor="#4CAF50">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextUploadMediaDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top|start"
+                        android:minLines="3"
+                        android:inputType="textMultiLine"
+                        android:textColor="#FFFFFF" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Media Preview Container -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    app:cardBackgroundColor="#2A3435"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/imageMediaPreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:background="#2A3435"
+                            android:contentDescription="Tap to select image or video"
+                            android:minHeight="200dp"
+                            android:scaleType="fitCenter" />
+
+                        <VideoView
+                            android:id="@+id/videoMediaPreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone" />
+
+                        <!-- Media Selection Prompt -->
+                        <TextView
+                            android:id="@+id/textSelectMedia"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:drawableTop="@android:drawable/ic_menu_gallery"
+                            android:drawablePadding="12dp"
+                            android:drawableTint="#4CAF50"
+                            android:gravity="center"
+                            android:padding="32dp"
+                            android:text="Tap to add photo or video"
+                            android:textColor="#80FFFFFF"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Upload Button -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/uploadButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="24dp"
+        android:paddingHorizontal="32dp"
+        android:text="Share Post"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#4CAF50"
+        app:icon="@android:drawable/ic_menu_upload"
+        app:iconTint="#FFFFFF" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

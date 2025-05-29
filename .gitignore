@@ -62,3 +62,6 @@ local.properties
 # Ignore OS-specific files
 .DS_Store
 Thumbs.db
+
+# Ignore firebase sensetive file
+google-services.json
