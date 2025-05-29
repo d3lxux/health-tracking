@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -70,9 +71,9 @@ public class HomeFragment extends Fragment {
         // Get user profile
         userProfile = dbHelper.getUserProfile();
         if (userProfile == null) {
-            userProfile = new UserProfile("Default User", 30, 170.0f, 70.0f, null);
+            userProfile = new UserProfile("Default User", 30, 170.0f, 70.0f, null, "Male");
             dbHelper.saveUserProfile(userProfile.getName(), userProfile.getAge(),
-                    userProfile.getHeight(), userProfile.getWeight(), null);
+                    userProfile.getHeight(), userProfile.getWeight(), null, userProfile.getGender());
         }
 
         // Start StepTrackingService
@@ -90,8 +91,12 @@ public class HomeFragment extends Fragment {
         filter.addAction(ACTION_UPDATE_UI);
         filter.addAction(CyclingTrackingService.ACTION_UPDATE_CYCLING_UI);
         filter.addAction(RunningTrackingService.ACTION_UPDATE_RUNNING_UI);
-        requireContext().registerReceiver(uiUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
-        requireContext().registerReceiver(uiUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            requireContext().registerReceiver(uiUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            requireContext().registerReceiver(uiUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        }
 
         // Update UI
         updateUI();

@@ -88,9 +88,9 @@ public class CyclingTrackingService extends Service implements LocationListener 
         dbHelper = new DatabaseHelper(this);
         userProfile = dbHelper.getUserProfile();
         if (userProfile == null) {
-            userProfile = new UserProfile("Default User", 30, 170.0f, 70.0f, null);
+            userProfile = new UserProfile("Default User", 30, 170.0f, 70.0f, null, "male");
             dbHelper.saveUserProfile(userProfile.getName(), userProfile.getAge(),
-                    userProfile.getHeight(), userProfile.getWeight(), null);
+                    userProfile.getHeight(), userProfile.getWeight(), null, userProfile.getGender());
         }
 
         // Initialize location manager
