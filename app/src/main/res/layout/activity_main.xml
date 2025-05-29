@@ -38,7 +38,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="Chat with AI Assistant"
-        app:srcCompat="@android:drawable/ic_dialog_email"
+        app:srcCompat="@drawable/ic_chatbot"
         app:backgroundTint="@android:color/holo_blue_dark"
         app:tint="@android:color/white" />
 
