@@ -30,7 +30,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thống kê đạp xe"
+                    android:text="Cycling statistic"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -86,7 +86,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thời gian"
+                            android:text="Time"
                             android:textColor="#AAAAAA"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -163,7 +163,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tốc độ TB"
+                        android:text="Average speed"
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:layout_marginTop="4dp" />
@@ -196,7 +196,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tốc độ tối đa"
+                        android:text="Max speed"
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:layout_marginTop="4dp" />
@@ -229,7 +229,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Độ cao"
+                        android:text="Height"
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:layout_marginTop="4dp" />
@@ -257,7 +257,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mục tiêu đạp xe"
+                    android:text="Goals"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -277,7 +277,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quãng đường"
+                            android:text="Distance"
                             android:textColor="#FFFFFF"
                             android:textSize="14sp" />
 
@@ -308,7 +308,7 @@
             android:id="@+id/start_cycling_button"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Bắt đầu đạp xe"
+            android:text="Start cycling"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -322,7 +322,7 @@
             android:id="@+id/recent_rides_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Các chuyến đạp xe gần đây"
+            android:text="Recent logs"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
