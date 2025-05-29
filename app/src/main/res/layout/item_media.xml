@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="#2A3435"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/mediaDateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="16dp"
+            android:text="Uploaded: 2025-01-01"
+            android:textColor="#80FFFFFF"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/mediaDescriptionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="3dp"
+            android:text="Description goes here"
+            android:textColor="#FFFFFF"
+            android:fontFamily="sans-serif-black"
+            android:textSize="16sp"/>
+
+        <ImageView
+            android:id="@+id/mediaImageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/bg_media_placeholder"
+            android:minHeight="150dp"
+            android:scaleType="fitCenter"
+            android:contentDescription="Media preview"/>
+
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/mediaVideoView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="200dp"
+            android:visibility="gone"
+            app:resize_mode="fixed_width"
+            style="@style/ExoMediaButton.Play"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
