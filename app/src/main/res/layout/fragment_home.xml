@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:text="Mục tiêu: 10.000 bước"
+                android:text="Goals: 10.000 steps"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
@@ -177,7 +177,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Vận Động"
+                            android:text="Excercise"
                             android:textColor="@color/white"
                             android:textSize="24sp" />
                     </LinearLayout>
@@ -219,7 +219,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Q.Đường"
+                            android:text="Distance"
                             android:textColor="@color/white"
                             android:textSize="24sp" />
                     </LinearLayout>

@@ -30,7 +30,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thống kê chạy bộ"
+                    android:text="Statistic running"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -86,7 +86,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thời gian"
+                            android:text="Time"
                             android:textColor="#AAAAAA"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -139,7 +139,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mục tiêu chạy bộ"
+                    android:text="Goals"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -159,7 +159,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quãng đường"
+                            android:text="Distance"
                             android:textColor="#FFFFFF"
                             android:textSize="14sp" />
 
@@ -198,7 +198,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thời gian"
+                            android:text="Time"
                             android:textColor="#FFFFFF"
                             android:textSize="14sp" />
 
@@ -206,7 +206,7 @@
                             android:id="@+id/time_goal_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="30 phút"
+                            android:text="30 mins"
                             android:textColor="#4CAF50"
                             android:textSize="14sp"
                             android:layout_marginStart="8dp" />
@@ -229,7 +229,7 @@
             android:id="@+id/start_run_button"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Bắt đầu chạy"
+            android:text="Start running"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -243,7 +243,7 @@
             android:id="@+id/recent_runs_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Các lần chạy gần đây"
+            android:text="Recent logs"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"

@@ -36,12 +36,12 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chạy bộ" />
+            android:text="Running" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đạp xe" />
+            android:text="Cycling" />
 
     </com.google.android.material.tabs.TabLayout>
 
