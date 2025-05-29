@@ -46,14 +46,23 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation(platform(libs.firebase.bom))
     // Add the dependency for the Cloud Storage library
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-storage")
-    implementation("com.google.firebase:firebase-database")
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.database)
     // For efficiency media loading
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation(libs.glide)
+    annotationProcessor(libs.compiler)
     // Media playback
-    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+    implementation(libs.exoplayer)
+    // Add the dependency for the Firebase AI Logic library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation(libs.firebase.ai)
+    // Required for one-shot operations (to use `ListenableFuture` from Guava Android)
+    implementation(libs.guava)
+    // Required for streaming operations (to use `Publisher` from Reactive Streams)
+    implementation(libs.reactive.streams)
+    // For core Markdown rendering
+    implementation(libs.core)
 }
