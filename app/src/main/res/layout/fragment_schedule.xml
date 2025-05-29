@@ -7,9 +7,11 @@
     android:layout_height="match_parent">
 
     <FrameLayout
+        android:background="@color/colorBlackblue"
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
@@ -23,13 +25,13 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="20dp"
-                android:background="@drawable/background_headingtitle">
+               >
 
                 <Button
                     android:id="@+id/btnShowCalendar"
                     android:layout_width="69dp"
                     android:layout_height="46dp"
-                    android:layout_marginEnd="16dp"
+
                     android:background="@android:color/transparent"
                     android:drawableTop="@drawable/schedule32"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -40,11 +42,11 @@
                     android:id="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
                     android:fontFamily="sans-serif-black"
                     android:text="Schedule"
-                    android:textColor="@color/black"
-                    android:textSize="20dp"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/white"
+                    android:textSize="25dp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -57,9 +59,9 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-black"
-                android:layout_marginStart="25dp"
+                android:layout_marginStart="30dp"
                 android:textSize="25dp"
-                android:textColor="@color/colorAccent"
+                android:textColor="@color/white"
                 android:layout_marginTop="20dp"
                 android:text="All tasks" />
 
@@ -73,6 +75,7 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerview"
+                    android:layout_marginStart="7dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>
@@ -83,7 +86,7 @@
         android:id="@+id/buttonaddtask"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#1C90ED"
+        android:backgroundTint="@color/green"
         android:fontFamily="sans-serif-black"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"

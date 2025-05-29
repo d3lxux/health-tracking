@@ -65,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "age INTEGER, " +
                 "height REAL, " +
                 "weight REAL, " +
-                "avatar_uri TEXT)";
+                "avatar_uri TEXT,gender TEXT)";
         db.execSQL(createUserProfileTable);
 
         String createExerciseTable = "CREATE TABLE " + TABLE_EXERCISES + " (" +
@@ -85,13 +85,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 2) {
-            db.execSQL("CREATE TABLE IF NOT EXISTS user_profile (" +
-                    "id INTEGER PRIMARY KEY, " +
-                    "name TEXT, " +
-                    "age INTEGER, " +
-                    "height REAL, " +
-                    "weight REAL, " +
-                    "avatar_uri TEXT)");
+            // Đã xử lý
+            db.execSQL("ALTER TABLE user_profile ADD COLUMN gender TEXT");
         }
         if (oldVersion < 3) {
             db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_EXERCISES + " (" +
@@ -165,7 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // Copy all existing data
             db.execSQL("INSERT INTO exercises_new SELECT * FROM " + TABLE_EXERCISES);
-            
+
             // Replace old table
             db.execSQL("DROP TABLE " + TABLE_EXERCISES);
             db.execSQL("ALTER TABLE exercises_new RENAME TO " + TABLE_EXERCISES);
@@ -272,8 +267,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return taskList;
     }
 
-    // --- Quản lý UserProfile ---
-    public void saveUserProfile(String name, int age, float height, float weight, String avatarUri) {
+    // Lưu thông tin người dùng
+    public void saveUserProfile(String name, int age, float height, float weight, String avatarUri, String gender) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("id", 1);
@@ -282,6 +277,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("height", height);
         values.put("weight", weight);
         values.put("avatar_uri", avatarUri);
+        values.put("gender", gender);
 
         int rows = db.update("user_profile", values, "id = ?", new String[]{"1"});
         if (rows == 0) {
@@ -301,7 +297,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     cursor.getInt(cursor.getColumnIndexOrThrow("age")),
                     cursor.getFloat(cursor.getColumnIndexOrThrow("height")),
                     cursor.getFloat(cursor.getColumnIndexOrThrow("weight")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("avatar_uri"))
+                    cursor.getString(cursor.getColumnIndexOrThrow("avatar_uri")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("gender"))
             );
             cursor.close();
             db.close();
@@ -490,7 +487,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return exerciseList;
     }
     // Calculate total calories for all exercises on a specific date
-    
+
     public int getTotalCaloriesByDate(String date) {
         List<Exercise> exercises = getExercisesByDate(date);
         int totalCalories = 0;
