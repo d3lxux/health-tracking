@@ -39,6 +39,7 @@ public class RunningTrackingService extends Service implements LocationListener 
     // Actions
     public static final String ACTION_START_RUNNING = "START_RUNNING";
     public static final String ACTION_STOP_RUNNING = "STOP_RUNNING";
+    public static final String ACTION_REQUEST_STATUS = "REQUEST_STATUS";
     public static final String ACTION_UPDATE_RUNNING_UI = "hcmute.edu.vn.healthtracking.ACTION_UPDATE_RUNNING_UI";
     
     // Intent extras for broadcasting
@@ -111,6 +112,10 @@ public class RunningTrackingService extends Service implements LocationListener 
                 startRunning();
             } else if (ACTION_STOP_RUNNING.equals(action)) {
                 stopRunning();
+            } else if (ACTION_REQUEST_STATUS.equals(action)) {
+                // Immediately broadcast current status
+                broadcastUpdate();
+                Log.d(TAG, "Status requested - broadcasting current state: isTracking=" + isTracking);
             }
         }
         

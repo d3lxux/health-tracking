@@ -49,12 +49,8 @@ public class WorkoutHistoryAdapter extends RecyclerView.Adapter<WorkoutHistoryAd
         // Set appropriate icon based on workout type
         if (isRunningWorkout) {
             holder.iconImageView.setImageResource(R.drawable.ic_running);
-            // Set green tint for running icon
-            holder.iconImageView.setColorFilter(ContextCompat.getColor(context, R.color.green_primary));
         } else {
             holder.iconImageView.setImageResource(R.drawable.ic_cycling);
-            // Set blue tint for cycling icon  
-            holder.iconImageView.setColorFilter(ContextCompat.getColor(context, R.color.primary_blue));
         }
         
         // Set click listener for the item

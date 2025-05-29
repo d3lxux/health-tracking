@@ -185,7 +185,7 @@ public class CyclingFragment extends Fragment {
             avgSpeedText.setText(String.format(Locale.getDefault(), "%.1f", avgSpeed));
             maxSpeedText.setText(String.format(Locale.getDefault(), "%.1f", maxSpeed));
             
-            // Update button state
+            // Update button state and tracking status
             isTracking = isCycling;
             if (isTracking) {
                 startCyclingButton.setText("Dừng đạp xe");
@@ -196,7 +196,7 @@ public class CyclingFragment extends Fragment {
             }
             
             Log.d(TAG, "UI updated - Distance: " + distance + "km, Duration: " + 
-                    ExerciseUtils.formatDuration(duration) + ", Calories: " + calories);
+                    ExerciseUtils.formatDuration(duration) + ", Calories: " + calories + ", isTracking: " + isTracking);
         });
     }
 
@@ -309,6 +309,19 @@ public class CyclingFragment extends Fragment {
         
         // Reload data when resuming
         loadCyclingHistoryFromDatabase();
+        
+        // Check if service is currently running and update UI accordingly
+        checkServiceStatus();
+    }
+    
+    private void checkServiceStatus() {
+        // Request current status from service if it's running
+        Intent statusIntent = new Intent(getContext(), CyclingTrackingService.class);
+        statusIntent.setAction(CyclingTrackingService.ACTION_REQUEST_STATUS);
+        if (getContext() != null) {
+            getContext().startService(statusIntent);
+        }
+        Log.d(TAG, "Requested service status");
     }
 
     @Override

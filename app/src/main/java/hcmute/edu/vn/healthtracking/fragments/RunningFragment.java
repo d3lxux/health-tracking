@@ -99,6 +99,9 @@ public class RunningFragment extends Fragment {
         
         // Setup broadcast receiver every time fragment becomes active
         setupBroadcastReceiver();
+        
+        // Check if service is currently running and update UI accordingly
+        checkServiceStatus();
     }
 
     @Override
@@ -272,10 +275,14 @@ public class RunningFragment extends Fragment {
             android.util.Log.d("RunningFragment", "Updated calories text: " + caloriesStr);
         }
         
-        // Update tracking state
+        // Update tracking state and button
         isTracking = isCurrentlyTracking;
         
-        if (!isTracking) {
+        if (isTracking) {
+            // Service is running, update button to show "stop" state
+            startRunButton.setText("Dừng chạy");
+            startRunButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), android.R.color.holo_red_dark));
+        } else {
             // Service stopped, reset button and flag
             receivingBroadcasts = false;
             startRunButton.setText("Bắt đầu chạy");
@@ -456,5 +463,14 @@ public class RunningFragment extends Fragment {
         if (localTimerHandler != null && localTimerRunnable != null) {
             localTimerHandler.removeCallbacks(localTimerRunnable);
         }
+    }
+
+    private void checkServiceStatus() {
+        // Request current status from service if it's running
+        Intent statusIntent = new Intent(requireContext(), RunningTrackingService.class);
+        statusIntent.setAction(RunningTrackingService.ACTION_REQUEST_STATUS);
+        requireContext().startService(statusIntent);
+        
+        android.util.Log.d("RunningFragment", "Requested service status");
     }
 } 
